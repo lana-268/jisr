@@ -12,3 +12,4 @@ serviceAccountKey.json
 *serviceAccountKey*.json
 *firebase-adminsdk*.json
 *.log
+/data/

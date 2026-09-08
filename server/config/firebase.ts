@@ -49,6 +49,27 @@ if (hasServiceAccountPath || hasEnvCredentials || hasEmulator) {
 // In-memory Firestore adapter for seamless Hackathon development & instant zero-setup execution
 class InMemoryFirestore {
   private collections: Map<string, Map<string, any>> = new Map();
+  private readonly storagePath = path.resolve(process.cwd(), 'data', 'in-memory-firestore.json');
+
+  constructor() {
+    try {
+      const stored = JSON.parse(fs.readFileSync(this.storagePath, 'utf8')) as Record<string, Record<string, any>>;
+      for (const [collectionName, documents] of Object.entries(stored)) {
+        this.collections.set(collectionName, new Map(Object.entries(documents)));
+      }
+    } catch {
+      // Start with an empty local database when no seed file exists yet.
+    }
+  }
+
+  private persist(): void {
+    const serializable: Record<string, Record<string, any>> = {};
+    for (const [collectionName, documents] of this.collections.entries()) {
+      serializable[collectionName] = Object.fromEntries(documents.entries());
+    }
+    fs.mkdirSync(path.dirname(this.storagePath), { recursive: true });
+    fs.writeFileSync(this.storagePath, JSON.stringify(serializable, null, 2), 'utf8');
+  }
 
   private getColMap(colName: string): Map<string, any> {
     if (!this.collections.has(colName)) {
@@ -73,10 +94,12 @@ class InMemoryFirestore {
     } else {
       col.set(id, { ...data });
     }
+    this.persist();
   }
 
   _deleteDoc(colName: string, id: string): void {
     this.getColMap(colName).delete(id);
+    this.persist();
   }
 
   _getAllDocs(colName: string): { id: string; data: any }[] {

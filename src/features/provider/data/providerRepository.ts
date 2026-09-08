@@ -86,7 +86,7 @@ export class MockProviderRepository implements ProviderRepository {
 }
 
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || (import.meta.env.MODE === 'development' || import.meta.env.MODE === 'production' ? '/api' : '')).replace(/\/$/, '');
-const providerId = import.meta.env.VITE_DEV_PROVIDER_ID || 'provider-food';
+const providerId = import.meta.env.VITE_DEV_PROVIDER_ID || 'prov_1';
 const headers = { 'Content-Type': 'application/json', 'x-user-id': providerId, 'x-user-role': 'PROVIDER' };
 const apiRequest = async <Value>(path: string, init?: RequestInit): Promise<Value> => {
   const response = await fetch(`${apiBaseUrl}${path}`, { ...init, headers: { ...headers, ...init?.headers } });
