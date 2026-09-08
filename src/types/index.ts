@@ -73,3 +73,16 @@ export interface DashboardStatistics {
   completedOrders: number;
   totalEarnings: number;
 }
+
+export type CatalogItem =
+  | { kind: 'product'; item: ProductItem; provider: Provider }
+  | { kind: 'service'; item: ServiceItem; provider: Provider };
+
+export interface District { districtId: string; name: string }
+
+export interface CatalogFilters {
+  district: string;
+  search: string;
+  track: 'ALL' | 'PRODUCTS' | 'SERVICES';
+  categoryId: string | null;
+}
