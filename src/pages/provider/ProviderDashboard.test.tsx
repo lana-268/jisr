@@ -1,10 +1,11 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 import { ProviderDashboard } from './ProviderDashboard';
 
 const renderDashboard = () => render(<MemoryRouter><ProviderDashboard/></MemoryRouter>);
+function LocationView() { return <output aria-label="provider-location">{useLocation().pathname}</output>; }
 describe('provider dashboard', () => {
   it('renders product management and switches to service management', async () => {
     renderDashboard();
@@ -59,4 +60,5 @@ describe('provider dashboard', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Save settings' }));
     expect(await screen.findByText('Settings saved for this device.')).toBeInTheDocument();
   });
+  it('logs the provider out to the login route', async () => { render(<MemoryRouter initialEntries={['/dashboard/provider']}><Routes><Route path="/dashboard/provider" element={<ProviderDashboard/>}/><Route path="/login" element={<LocationView/>}/></Routes></MemoryRouter>); await screen.findByRole('heading', { name: 'Products' }, { timeout: 2000 }); await userEvent.click(screen.getByRole('button', { name: 'Log out' })); const dialog = screen.getByRole('dialog', { name: 'Log out of Jisr?' }); await userEvent.click(within(dialog).getByRole('button', { name: 'Log out' })); expect(screen.getByLabelText('provider-location')).toHaveTextContent('/login'); });
 });

@@ -1,5 +1,6 @@
 import { AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { NavAction } from '../../features/provider/components/ProviderNavigation';
 import { ProviderHeader } from '../../features/provider/components/ProviderHeader';
 import { ProviderProfileCard } from '../../features/provider/components/ProviderProfileCard';
@@ -18,6 +19,7 @@ import { StatusBadge } from '../../shared/components/StatusBadge';
 
 export function ProviderDashboard() {
   const dashboard = useProviderDashboard();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
@@ -51,7 +53,7 @@ export function ProviderDashboard() {
     <Modal open={profileOpen} onClose={() => setProfileOpen(false)} title="Provider profile" description="Information shown for your local business"><ProviderProfileCard key={provider.providerId} provider={provider} saving={dashboard.updating} onSave={dashboard.updateProfile} onClose={() => setProfileOpen(false)}/></Modal>
     <Modal open={messagesOpen} onClose={() => setMessagesOpen(false)} title="Messages" description="Chat with customers about active orders" size="lg"><ProviderMessages provider={provider} onMessageSent={dashboard.notify}/></Modal>
     <Modal open={settingsOpen} onClose={() => setSettingsOpen(false)} title="Settings" description={`Preferences for ${provider.businessName}`} size="lg"><ProviderSettings key={provider.providerId} provider={provider} onSaved={dashboard.notify}/></Modal>
-    <ConfirmDialog open={logoutOpen} onClose={() => setLogoutOpen(false)} title="Log out of Jisr?" message="Authentication is not connected in this frontend demo. You’ll remain on this dashboard." confirmLabel="Log out" onConfirm={() => { setLogoutOpen(false); dashboard.notify('Demo logout complete — no session was changed.'); }}/>
+    <ConfirmDialog open={logoutOpen} onClose={() => setLogoutOpen(false)} title="Log out of Jisr?" message="You’ll return to the login page. Local demo data will remain available when you come back." confirmLabel="Log out" onConfirm={() => { sessionStorage.removeItem('jisr-demo-session'); setLogoutOpen(false); navigate('/login', { replace: true }); }}/>
     <Toast message={dashboard.toast?.message ?? null} tone={dashboard.toast?.tone} onClose={dashboard.clearToast}/>
   </div>;
 }
