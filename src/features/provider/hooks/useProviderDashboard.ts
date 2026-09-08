@@ -59,6 +59,7 @@ export function useProviderDashboard(repository: ProviderRepository = providerRe
     } catch (error) { notify(error instanceof Error ? error.message : 'Availability could not be updated.', 'error'); }
     finally { setUpdating(false); }
   };
+  const updateProfile = async (changes: Pick<Provider, 'businessName' | 'email' | 'phone' | 'district'>) => { if (!provider) return false; setUpdating(true); try { const saved = await repository.updateProvider(provider.providerId, changes); setProvider(saved); setProviders((items) => items.map((item) => item.providerId === saved.providerId ? saved : item)); notify('Provider profile updated.'); return true; } catch { notify('Profile could not be updated.', 'error'); return false; } finally { setUpdating(false); } };
 
   const saveProduct = async (values: Omit<ProductItem, 'productId' | 'createdAt'>, productId?: string) => {
     setUpdating(true);
@@ -96,5 +97,5 @@ export function useProviderDashboard(repository: ProviderRepository = providerRe
   const deleteService = async (serviceId: string) => { setUpdating(true); try { await repository.deleteService(serviceId); setServices((items) => items.filter((item) => item.serviceId !== serviceId)); notify('Service deleted.'); } catch { notify('Service could not be deleted.', 'error'); } finally { setUpdating(false); } };
   const updateOrder = async (orderId: string, status: OrderStatus) => { setUpdating(true); try { await repository.updateOrderStatus(orderId, status); setOrders((items) => items.map((item) => item.orderId === orderId ? { ...item, status } : item)); notify(status === 'COMPLETED' ? 'Order marked completed.' : status === 'CANCELLED' ? 'Order cancelled.' : 'Order started.'); } catch (error) { notify(error instanceof Error ? error.message : 'Order could not be updated.', 'error'); } finally { setUpdating(false); } };
 
-  return { providers, provider, products, services, orders, loading, updating, toast, statistics: useMemo(() => calculateStatistics(orders), [orders]), switchProvider, updateOnline, saveProduct, saveService, patchProduct, patchService, deleteProduct, deleteService, updateOrder, notify, clearToast: () => setToast(null) };
+  return { providers, provider, products, services, orders, loading, updating, toast, statistics: useMemo(() => calculateStatistics(orders), [orders]), switchProvider, updateOnline, updateProfile, saveProduct, saveService, patchProduct, patchService, deleteProduct, deleteService, updateOrder, notify, clearToast: () => setToast(null) };
 }

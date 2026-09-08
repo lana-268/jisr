@@ -7,6 +7,9 @@ import { LandingPage } from './landing/LandingPage';
 import { UserCatalog } from './user/UserCatalog';
 import { ResponsiveImage } from '../features/catalog/components/CatalogCards';
 import { RequestContactModal } from '../features/catalog/components/RequestContactModal';
+import { AuthPage } from './auth/AuthPage';
+import { CustomerOrders } from './customer/CustomerOrders';
+import { saveCustomerRequest } from '../features/catalog/data/customerRequests';
 
 function LocationView() { const location = useLocation(); return <output aria-label="location">{location.pathname}{location.search}</output>; }
 describe('customer experience', () => {
@@ -17,4 +20,6 @@ describe('customer experience', () => {
   it('filters with product track and category controls', async () => { render(<MemoryRouter initialEntries={['/user']}><UserCatalog/></MemoryRouter>); await screen.findByRole('heading', { name: 'Home-Cooked Meals' }, { timeout: 2000 }); await userEvent.click(screen.getByRole('button', { name: 'Home Products' })); expect(screen.queryByRole('heading', { name: 'Delivery' })).not.toBeInTheDocument(); await userEvent.click(screen.getByRole('button', { name: 'Desserts' })); expect(screen.getByRole('heading', { name: 'Desserts' })).toBeInTheDocument(); });
   it('validates required request details', async () => { const entry = { kind: 'product' as const, item: catalogProducts[0], provider: catalogProviders[0] }; render(<RequestContactModal entry={entry} onClose={() => undefined} onSuccess={() => undefined}/>); await userEvent.click(screen.getByRole('button', { name: 'Send Request' })); expect(screen.getByText('Tell the provider what you need.')).toBeInTheDocument(); expect(screen.getByText('Choose a preferred date.')).toBeInTheDocument(); });
   it('renders a placeholder for missing images', () => { render(<ResponsiveImage alt="Spinach Börek"/>); expect(screen.getByRole('img', { name: 'Spinach Börek image unavailable' })).toBeInTheDocument(); });
+  it('validates and completes the mock login flow', async () => { render(<MemoryRouter initialEntries={['/login']}><Routes><Route path="/login" element={<AuthPage/>}/><Route path="/user" element={<LocationView/>}/></Routes></MemoryRouter>); await userEvent.click(screen.getByRole('button', { name: 'Log in' })); expect(screen.getByText('Enter a valid email address.')).toBeInTheDocument(); await userEvent.type(screen.getByLabelText(/Email address/), 'user@example.com'); await userEvent.type(screen.getByLabelText(/Password/), 'secret1'); await userEvent.click(screen.getByRole('button', { name: 'Log in' })); expect(await screen.findByLabelText('location')).toHaveTextContent('/user'); });
+  it('shows persisted requests and supports cancellation', async () => { localStorage.clear(); saveCustomerRequest({ kind: 'product', item: catalogProducts[0], provider: catalogProviders[0] }, 'Two portions please', '2026-10-10', '18:00'); render(<MemoryRouter><CustomerOrders/></MemoryRouter>); expect(screen.getByText('Chicken Kabsa')).toBeInTheDocument(); await userEvent.click(screen.getByRole('button', { name: 'Cancel' })); expect(screen.getByRole('heading', { name: 'Cancel this request?' })).toBeInTheDocument(); await userEvent.click(screen.getByRole('button', { name: 'Cancel request' })); expect(screen.getByText('Cancelled')).toBeInTheDocument(); });
 });

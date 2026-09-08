@@ -17,4 +17,16 @@
 
 @media (max-width: 639px) {
   table { font-size: 13px; }
+  [aria-live='polite'] { inset-inline: 16px; width: auto; max-width: none; }
+  [role='dialog'] { max-height: 94dvh; }
+  [data-testid='mobile-order-cards'] article > div:last-child { align-items: stretch; flex-direction: column; }
+  [data-testid='mobile-order-cards'] article > div:last-child > div { justify-content: stretch; }
+  [data-testid='mobile-order-cards'] article > div:last-child button { flex: 1; }
+}
+
+/* Tables become cards through tablet and compact desktop widths, where the
+   240px provider sidebar otherwise leaves too little room for readable rows. */
+@media (min-width: 768px) and (max-width: 1199px) {
+  [data-testid='desktop-listing-table'], [data-testid='desktop-orders-table'] { display: none !important; }
+  [data-testid='mobile-listing-cards'], [data-testid='mobile-order-cards'] { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
