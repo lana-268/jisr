@@ -63,7 +63,7 @@ export function AdminDashboard({ repository }: AdminDashboardProps) {
   return <div className="min-h-screen bg-page text-body">
     <AdminNavigation profile={profile} active={activeNav} onAction={onNavigation} />
     <AdminNavigation profile={profile} active={activeNav} onAction={onNavigation} mobile open={menuOpen} onClose={() => setMenuOpen(false)} />
-    <AdminHeader profile={profile} onMenu={() => setMenuOpen(true)} onNotifications={() => dashboard.notify(`${dashboard.statistics.pendingProviders} provider applications are waiting for review.`)} onProfile={() => setProfileOpen(true)} />
+    <AdminHeader profile={profile} onMenu={() => setMenuOpen(true)} onNotifications={() => dashboard.notify(`${dashboard.statistics?.pendingProviders ?? 0} provider applications are waiting for review.`)} onProfile={() => setProfileOpen(true)} />
     <main className="lg:ml-60">
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <section id="overview" className="scroll-mt-28 grid gap-5 xl:grid-cols-[minmax(0,1fr)_390px] xl:items-end">

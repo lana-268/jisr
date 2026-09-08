@@ -21,14 +21,16 @@ export class MockCatalogRepository implements CatalogRepository {
 }
 
 export class ApiCatalogRepository implements CatalogRepository {
+  private async productEntries() { return request<Array<{ item: ProductItem; provider: Provider }>>('/catalog/products'); }
+  private async serviceEntries() { return request<Array<{ item: ServiceItem; provider: Provider }>>('/catalog/services'); }
   async getProviders() {
-    const [products, services] = await Promise.all([this.getProducts(), this.getServices()]);
+    const [products, services] = await Promise.all([this.productEntries(), this.serviceEntries()]);
     return [...products, ...services].reduce<Provider[]>((providers, entry) => providers.some((provider) => provider.providerId === entry.provider.providerId) ? providers : [...providers, entry.provider], []);
   }
   async getProductCategories() { return request<ProductCategory[]>('/categories/products'); }
   async getServiceCategories() { return request<ServiceCategory[]>('/categories/services'); }
-  async getProducts() { return (await request<Array<{ item: ProductItem; provider: Provider }>>('/catalog/products')).map(({ item }) => item); }
-  async getServices() { return (await request<Array<{ item: ServiceItem; provider: Provider }>>('/catalog/services')).map(({ item }) => item); }
+  async getProducts() { return (await this.productEntries()).map(({ item }) => item); }
+  async getServices() { return (await this.serviceEntries()).map(({ item }) => item); }
 }
 
 export const catalogRepository: CatalogRepository = apiBaseUrl ? new ApiCatalogRepository() : new MockCatalogRepository();
