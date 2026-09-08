@@ -1,7 +1,8 @@
-import { AlertCircle, ArrowRight, MapPin, Sparkles } from 'lucide-react';
+import { AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import type { NavAction } from '../../features/provider/components/ProviderNavigation';
-import { ProviderHeader, providerTypeLabel } from '../../features/provider/components/ProviderHeader';
+import { ProviderHeader } from '../../features/provider/components/ProviderHeader';
+import { ProviderProfileCard } from '../../features/provider/components/ProviderProfileCard';
 import { ListingSection } from '../../features/provider/components/ListingSection';
 import { ProviderOrders } from '../../features/provider/components/ProviderOrders';
 import { ProviderMessages } from '../../features/provider/components/ProviderMessages';
@@ -11,7 +12,6 @@ import { ProviderStatusToggle } from '../../features/provider/components/Provide
 import { ProviderSummaryCards } from '../../features/provider/components/ProviderSummaryCards';
 import { ProviderTypePreview } from '../../features/provider/components/ProviderTypePreview';
 import { useProviderDashboard } from '../../features/provider/hooks/useProviderDashboard';
-import { Button } from '../../shared/components/Button';
 import { ConfirmDialog, LoadingSkeleton, Toast } from '../../shared/components/Feedback';
 import { Modal } from '../../shared/components/Modal';
 import { StatusBadge } from '../../shared/components/StatusBadge';
@@ -48,7 +48,7 @@ export function ProviderDashboard() {
       <ProviderOrders orders={dashboard.orders} updating={dashboard.updating} onUpdate={dashboard.updateOrder}/>
       <footer className="flex flex-col gap-3 border-t border-border pb-3 pt-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between"><p>© 2026 Jisr. Better neighbors, stronger communities.</p><p className="inline-flex items-center gap-1 font-medium text-success">Built for local trust <ArrowRight className="h-4 w-4"/></p></footer>
     </div></main>
-    <Modal open={profileOpen} onClose={() => setProfileOpen(false)} title="Provider profile" description="Demo information from the local repository"><div className="mb-6 flex items-center gap-4"><span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft text-lg font-bold text-primary">{provider.businessName.split(' ').slice(0,2).map((part) => part[0]).join('')}</span><div><h3 className="font-semibold text-heading">{provider.businessName}</h3><p className="text-sm text-muted">{providerTypeLabel(provider)}</p><div className="mt-2"><StatusBadge status={provider.status}/></div></div></div><dl className="space-y-4 rounded-xl bg-page p-4 text-sm"><div><dt className="text-muted">District</dt><dd className="mt-1 flex items-center gap-1.5 font-semibold text-heading"><MapPin className="h-4 w-4 text-primary"/>{provider.district}, İstanbul</dd></div><div><dt className="text-muted">Email</dt><dd className="mt-1 font-semibold text-heading">{provider.email}</dd></div><div><dt className="text-muted">Phone</dt><dd className="mt-1 font-semibold text-heading">{provider.phone}</dd></div></dl><Button className="mt-6 w-full" variant="outline" onClick={() => { setProfileOpen(false); dashboard.notify('Profile editing is coming soon.'); }}>Edit profile</Button></Modal>
+    <Modal open={profileOpen} onClose={() => setProfileOpen(false)} title="Provider profile" description="Information shown for your local business"><ProviderProfileCard key={provider.providerId} provider={provider} saving={dashboard.updating} onSave={dashboard.updateProfile} onClose={() => setProfileOpen(false)}/></Modal>
     <Modal open={messagesOpen} onClose={() => setMessagesOpen(false)} title="Messages" description="Chat with customers about active orders" size="lg"><ProviderMessages provider={provider} onMessageSent={dashboard.notify}/></Modal>
     <Modal open={settingsOpen} onClose={() => setSettingsOpen(false)} title="Settings" description={`Preferences for ${provider.businessName}`} size="lg"><ProviderSettings key={provider.providerId} provider={provider} onSaved={dashboard.notify}/></Modal>
     <ConfirmDialog open={logoutOpen} onClose={() => setLogoutOpen(false)} title="Log out of Jisr?" message="Authentication is not connected in this frontend demo. You’ll remain on this dashboard." confirmLabel="Log out" onConfirm={() => { setLogoutOpen(false); dashboard.notify('Demo logout complete — no session was changed.'); }}/>

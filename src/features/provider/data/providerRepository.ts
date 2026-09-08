@@ -8,6 +8,7 @@ export interface ProviderRepository {
   getProducts(providerId: string): Promise<ProductItem[]>;
   getServices(providerId: string): Promise<ServiceItem[]>;
   getOrders(providerId: string): Promise<Order[]>;
+  updateProvider(providerId: string, changes: Pick<Provider, 'businessName' | 'email' | 'phone' | 'district'>): Promise<Provider>;
   createProduct(input: Omit<ProductItem, 'productId' | 'createdAt'>): Promise<ProductItem>;
   updateProduct(productId: string, changes: Partial<ProductItem>): Promise<ProductItem>;
   deleteProduct(productId: string): Promise<void>;
@@ -31,6 +32,7 @@ export class MockProviderRepository implements ProviderRepository {
   async getProducts(providerId: string) { await delay(); return structuredClone(this.products.filter((item) => item.providerId === providerId)); }
   async getServices(providerId: string) { await delay(); return structuredClone(this.services.filter((item) => item.providerId === providerId)); }
   async getOrders(providerId: string) { await delay(); return structuredClone(this.orders.filter((item) => item.providerId === providerId)); }
+  async updateProvider(providerId: string, changes: Pick<Provider, 'businessName' | 'email' | 'phone' | 'district'>) { await delay(); const index = this.providers.findIndex((item) => item.providerId === providerId); if (index < 0) throw new Error('Provider not found'); this.providers[index] = { ...this.providers[index], ...changes }; return structuredClone(this.providers[index]); }
 
   async createProduct(input: Omit<ProductItem, 'productId' | 'createdAt'>) {
     await delay();

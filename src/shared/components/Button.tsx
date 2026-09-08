@@ -15,9 +15,11 @@ const variants = {
   danger: 'bg-danger text-white hover:bg-red-700 border-danger',
 };
 
+export const buttonStyles = (variant: ButtonProps['variant'] = 'primary', className = '') => `inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border px-5 text-[15px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-55 ${variants[variant]} ${className}`;
+
 export function Button({ variant = 'primary', loading = false, icon, className = '', disabled, children, ...props }: ButtonProps) {
   return (
-    <button className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border px-5 text-[15px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-55 ${variants[variant]} ${className}`} disabled={disabled || loading} {...props}>
+    <button className={buttonStyles(variant, className)} disabled={disabled || loading} {...props}>
       {loading ? <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" /> : icon}
       {children}
     </button>

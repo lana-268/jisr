@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Order } from '../../../types';
-import { calculateStatistics, canTransitionOrderStatus } from './dashboard';
+import { calculateStatistics, canTransitionOrderStatus, formatCurrency } from './dashboard';
 
 const orders: Order[] = [
   { orderId: '1', customerId: '1', customerName: 'A', providerId: 'p', itemTitle: 'One', totalPrice: 100, status: 'PENDING', createdAt: '' },
@@ -13,4 +13,5 @@ describe('dashboard utilities', () => {
   it('calculates statistics from order state', () => expect(calculateStatistics(orders)).toEqual({ pendingOrders: 1, inProgressOrders: 1, completedOrders: 1, totalEarnings: 400 }));
   it('accepts valid order transitions', () => { expect(canTransitionOrderStatus('PENDING', 'IN_PROGRESS')).toBe(true); expect(canTransitionOrderStatus('IN_PROGRESS', 'COMPLETED')).toBe(true); });
   it('rejects invalid order transitions', () => { expect(canTransitionOrderStatus('COMPLETED', 'PENDING')).toBe(false); expect(canTransitionOrderStatus('CANCELLED', 'COMPLETED')).toBe(false); });
+  it('formats money as Turkish lira', () => expect(formatCurrency(500)).toMatch(/500/));
 });
