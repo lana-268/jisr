@@ -14,6 +14,7 @@ export const router = createBrowserRouter([
   { path: '/user', element: <UserCatalog/> },
   { path: '/dashboard/provider', element: <ProviderDashboard/> },
   { path: '/dashboard/admin', element: <AdminDashboard/> },
+  { path: '/admin', element: <Navigate to="/dashboard/admin" replace/> },
   { path: '/login', element: <AuthPage/> },
   { path: '/register', element: <AuthPage/> },
   { path: '/orders', element: <CustomerOrders/> },
