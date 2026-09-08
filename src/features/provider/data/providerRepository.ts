@@ -85,4 +85,34 @@ export class MockProviderRepository implements ProviderRepository {
   }
 }
 
-export const providerRepository: ProviderRepository = new MockProviderRepository();
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || (import.meta.env.MODE === 'development' || import.meta.env.MODE === 'production' ? '/api' : '')).replace(/\/$/, '');
+const providerId = import.meta.env.VITE_DEV_PROVIDER_ID || 'provider-food';
+const headers = { 'Content-Type': 'application/json', 'x-user-id': providerId, 'x-user-role': 'PROVIDER' };
+const apiRequest = async <Value>(path: string, init?: RequestInit): Promise<Value> => {
+  const response = await fetch(`${apiBaseUrl}${path}`, { ...init, headers: { ...headers, ...init?.headers } });
+  const payload = await response.json() as { data?: Value; message?: string };
+  if (!response.ok) throw new Error(payload.message || `API request failed: ${response.status}`);
+  return payload.data as Value;
+};
+
+class ApiProviderRepository implements ProviderRepository {
+  async getCurrentProvider() {
+    const result = await apiRequest<{ profile: Provider }>('/users/me');
+    return result.profile;
+  }
+  async getProviders() { return [await this.getCurrentProvider()]; }
+  async getProducts(providerIdToLoad: string) { const items = await apiRequest<{ products: ProductItem[] }>('/providers/my-items'); return items.products.filter((item) => item.providerId === providerIdToLoad); }
+  async getServices(providerIdToLoad: string) { const items = await apiRequest<{ services: ServiceItem[] }>('/providers/my-items'); return items.services.filter((item) => item.providerId === providerIdToLoad); }
+  async getOrders() { return apiRequest<Order[]>('/providers/orders'); }
+  async updateProvider(_providerId: string, _changes: Pick<Provider, 'businessName' | 'email' | 'phone' | 'district'>): Promise<Provider> { throw new Error('Provider profile editing is not available in the backend yet.'); }
+  async createProduct(input: Omit<ProductItem, 'productId' | 'createdAt'>) { return apiRequest<ProductItem>('/providers/products', { method: 'POST', body: JSON.stringify(input) }); }
+  async updateProduct(productId: string, changes: Partial<ProductItem>) { if (changes.isAvailable !== undefined) return apiRequest<{ item: ProductItem }>(`/providers/items/${productId}/availability`, { method: 'PATCH' }).then((result) => result.item); throw new Error('Product editing is not available in the backend yet.'); }
+  async deleteProduct(productId: string) { await apiRequest(`/providers/items/${productId}`, { method: 'DELETE' }); }
+  async createService(input: Omit<ServiceItem, 'serviceId' | 'createdAt'>) { return apiRequest<ServiceItem>('/providers/services', { method: 'POST', body: JSON.stringify(input) }); }
+  async updateService(serviceId: string, changes: Partial<ServiceItem>) { if (changes.isAvailable !== undefined) return apiRequest<{ item: ServiceItem }>(`/providers/items/${serviceId}/availability`, { method: 'PATCH' }).then((result) => result.item); throw new Error('Service editing is not available in the backend yet.'); }
+  async deleteService(serviceId: string) { await apiRequest(`/providers/items/${serviceId}`, { method: 'DELETE' }); }
+  async updateOnlineStatus() { await apiRequest('/providers/toggle-online', { method: 'PATCH' }); }
+  async updateOrderStatus(orderId: string, status: OrderStatus) { await apiRequest(`/providers/orders/${orderId}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }); }
+}
+
+export const providerRepository: ProviderRepository = apiBaseUrl ? new ApiProviderRepository() : new MockProviderRepository();

@@ -53,4 +53,22 @@ export function createMockAdminRepository({ delayMs = 180 }: MockAdminRepository
   };
 }
 
-export const adminRepository = createMockAdminRepository();
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || (import.meta.env.MODE === 'development' || import.meta.env.MODE === 'production' ? '/api' : '')).replace(/\/$/, '');
+const adminHeaders = { 'Content-Type': 'application/json', 'x-user-id': import.meta.env.VITE_DEV_ADMIN_ID || 'admin-super-1', 'x-user-role': 'ADMIN', 'x-admin-type': 'SUPER_ADMIN' };
+const adminRequest = async <Value>(path: string, init?: RequestInit): Promise<Value> => {
+  const response = await fetch(`${apiBaseUrl}${path}`, { ...init, headers: { ...adminHeaders, ...init?.headers } });
+  const payload = await response.json() as { data?: Value; message?: string };
+  if (!response.ok) throw new Error(payload.message || `API request failed: ${response.status}`);
+  return payload.data as Value;
+};
+
+const apiAdminRepository: AdminRepository = {
+  async getDashboard() {
+    const providers = await adminRequest<AdminDashboardSnapshot['providers']>('/admin/providers');
+    return { profile: { ...mockAdminProfile }, customers: mockAdminCustomers.map(copyCustomer), providers, orders: mockAdminOrders.map(copyOrder) };
+  },
+  async updateCustomerStatus() { throw new Error('Customer account management is not available in the backend yet.'); },
+  async updateProviderStatus(providerId, status) { return adminRequest<AdminDashboardSnapshot['providers'][number]>(`/admin/providers/${providerId}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }); },
+};
+
+export const adminRepository = apiBaseUrl ? apiAdminRepository : createMockAdminRepository();
