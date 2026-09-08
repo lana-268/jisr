@@ -55,7 +55,7 @@ export const authenticate = async (
     }
 
     // 1. Check Dev Header or Dev Token (Extremely convenient for Hackathon demos & automated tests)
-    const isDevAllowed = process.env.ALLOW_DEV_AUTH === 'true' || process.env.NODE_ENV === 'development';
+    const isDevAllowed = process.env.NODE_ENV !== 'production' && process.env.ALLOW_DEV_AUTH !== 'false';
 
     if (isDevAllowed) {
       if (devUserId) {
