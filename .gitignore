@@ -1,6 +1,14 @@
 node_modules
 dist
+dist-server
 coverage
 *.tsbuildinfo
 vite.config.js
 vite.config.d.ts
+.env
+.env.*
+!.env.example
+serviceAccountKey.json
+*serviceAccountKey*.json
+*firebase-adminsdk*.json
+*.log

@@ -23,7 +23,10 @@ export default {
         warning: '#B98542',
         danger: '#B7534C',
       },
-      boxShadow: { card: '0 1px 3px rgba(26, 26, 23, 0.05)' },
+      boxShadow: {
+        card: '0 1px 3px rgba(26, 26, 23, 0.05)',
+        popover: '0 12px 32px rgba(26, 26, 23, 0.10)',
+      },
       fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
     },
   },

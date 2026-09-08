@@ -1,10 +1,21 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+/**
+ * Public Firebase project identifiers for the future frontend integration.
+ *
+ * The current application deliberately uses local mock repositories, so this
+ * module has no SDK import or initialization side effect. When authentication
+ * and the real data repositories are connected, initialize Firebase in the
+ * application composition layer and inject those repositories into features.
+ */
+export interface FirebaseClientConfig {
+  apiKey: string;
+  authDomain: string;
+  projectId: string;
+  storageBucket: string;
+  messagingSenderId: string;
+  appId: string;
+}
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
+export const firebaseConfig: FirebaseClientConfig = {
   apiKey: "AIzaSyAQl6WS0cMEAtOGSENqlYURjO47-BBLynE",
   authDomain: "mahalle-hub.firebaseapp.com",
   projectId: "mahalle-hub",
@@ -12,6 +23,3 @@ const firebaseConfig = {
   messagingSenderId: "23120368964",
   appId: "1:23120368964:web:a2d63d941f276eca653311"
 };
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
