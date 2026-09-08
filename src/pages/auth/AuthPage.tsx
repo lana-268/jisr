@@ -7,7 +7,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { Button } from "../../shared/components/Button";
-import { Input, Select } from "../../shared/components/FormControls";
+import { Input } from "../../shared/components/FormControls";
 import { PublicBrand } from "../../shared/layout/PublicLayout";
 import { saveDemoSession, type DemoRole } from "../../shared/utils/demoSession";
 
@@ -69,9 +69,9 @@ export function AuthPage() {
                 : "Continue to your customer, provider, or admin experience."}
             </p>
           </div>
-          {register && (
-            <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-3">
               <button
+                type="button"
                 aria-pressed={role === "customer"}
                 onClick={() => setRole("customer")}
                 className={`min-h-24 rounded-xl border p-4 text-start ${role === "customer" ? "border-primary bg-primary-soft" : "border-border bg-surface"}`}
@@ -93,6 +93,7 @@ export function AuthPage() {
                 </span>
               </button>
               <button
+                type="button"
                 aria-pressed={role === "provider"}
                 onClick={() => setRole("provider")}
                 className={`min-h-24 rounded-xl border p-4 text-start ${role === "provider" ? "border-primary bg-primary-soft" : "border-border bg-surface"}`}
@@ -102,8 +103,7 @@ export function AuthPage() {
                   Provider
                 </span>
               </button>
-            </div>
-          )}
+          </div>
           <form noValidate onSubmit={submit} className="mt-7 space-y-5">
             {register && (
               <Input
@@ -144,19 +144,6 @@ export function AuthPage() {
                   : undefined
               }
             />
-            {!register && (
-              <Select
-                label="Continue as"
-                value={role}
-                onChange={(event) =>
-                  setRole(event.target.value as DemoRole)
-                }
-              >
-                <option value="customer">Customer</option>
-                <option value="provider">Provider</option>
-                <option value="admin">Admin</option>
-              </Select>
-            )}
             <Button
               type="submit"
               loading={saving}
